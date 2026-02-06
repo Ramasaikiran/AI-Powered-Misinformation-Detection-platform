@@ -1,10 +1,13 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ICONS } from '../constants';
-import { getChatbotResponse } from '../services/geminiService';
+import { getChatbotResponse, ChatResponse } from '../services/geminiService';
+import { GroundingSource } from '../types';
 
 interface Message {
     text: string;
     sender: 'user' | 'bot';
+    sources?: GroundingSource[];
 }
 
 const Chatbot: React.FC = () => {
@@ -31,8 +34,12 @@ const Chatbot: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const botResponseText = await getChatbotResponse(userInput);
-            const newBotMessage: Message = { text: botResponseText, sender: 'bot' };
+            const botResult: ChatResponse = await getChatbotResponse(userInput);
+            const newBotMessage: Message = { 
+                text: botResult.text, 
+                sender: 'bot',
+                sources: botResult.sources 
+            };
             setMessages(prev => [...prev, newBotMessage]);
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "Sorry, I couldn't get a response.";
@@ -60,32 +67,48 @@ const Chatbot: React.FC = () => {
             </button>
             {isOpen && (
                 <div className="fixed bottom-20 right-6 w-full max-w-sm h-full max-h-[600px] bg-white dark:bg-black backdrop-blur-md rounded-2xl shadow-2xl z-50 flex flex-col animate-fade-in-up border border-black/10 dark:border-white/10">
-                    {/* Header */}
                     <div className="flex justify-between items-center p-4 border-b border-black/10 dark:border-white/10">
                         <h3 className="font-bold text-black dark:text-white">CodeHustlers Assistant</h3>
                         <button onClick={() => setIsOpen(false)} className="text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white">&times;</button>
                     </div>
 
-                    {/* Messages */}
                     <div className="flex-1 p-4 overflow-y-auto">
                         {messages.map((msg, index) => (
-                            <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
-                                <div className={`px-4 py-2 rounded-lg max-w-xs ${msg.sender === 'user' ? 'bg-indigo-600 text-white' : 'bg-black/10 text-black dark:bg-white/10 dark:text-white'}`}>
+                            <div key={index} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} mb-4`}>
+                                <div className={`px-4 py-2 rounded-lg max-w-[85%] ${msg.sender === 'user' ? 'bg-indigo-600 text-white' : 'bg-black/10 text-black dark:bg-white/10 dark:text-white'}`}>
                                     {msg.text}
                                 </div>
+                                {msg.sources && msg.sources.length > 0 && (
+                                    <div className="mt-2 text-[10px] space-y-1 max-w-[85%]">
+                                        <p className="font-bold uppercase text-black/40 dark:text-white/40">Sources:</p>
+                                        <div className="flex flex-wrap gap-1">
+                                            {msg.sources.map((source, sIdx) => (
+                                                <a 
+                                                    key={sIdx} 
+                                                    href={source.uri} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer" 
+                                                    className="inline-block bg-indigo-500/10 text-indigo-500 px-1.5 py-0.5 rounded hover:bg-indigo-500/20 truncate max-w-[120px]"
+                                                    title={source.title}
+                                                >
+                                                    {source.title}
+                                                </a>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         ))}
                         {isLoading && (
                             <div className="flex justify-start mb-3">
                                 <div className="px-4 py-2 rounded-lg bg-black/10 dark:bg-white/10 text-black dark:text-white">
-                                    <span className="animate-pulse">...</span>
+                                    <span className="animate-pulse">Analyzing...</span>
                                 </div>
                             </div>
                         )}
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Input */}
                     <div className="p-4 border-t border-black/10 dark:border-white/10">
                         <div className="flex space-x-2">
                             <input
@@ -93,7 +116,7 @@ const Chatbot: React.FC = () => {
                                 value={userInput}
                                 onChange={(e) => setUserInput(e.target.value)}
                                 onKeyPress={handleKeyPress}
-                                placeholder="Ask a question..."
+                                placeholder="Ask about misinformation..."
                                 className="w-full bg-transparent p-2 rounded-md border border-black/20 dark:border-white/20 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 disabled={isLoading}
                             />

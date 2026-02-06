@@ -1,10 +1,9 @@
 
 import { GoogleGenAI, GenerateContentResponse, Type, Chat } from "@google/genai";
+import { GroundingSource } from "../types";
 
-// Always use the named parameter for apiKey and obtain it directly from process.env.API_KEY.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-// Initialize a chat session for the chatbot using gemini-3-flash-preview as recommended for basic text tasks.
 const chat: Chat = ai.chats.create({
   model: 'gemini-3-flash-preview',
   config: {
@@ -13,11 +12,24 @@ const chat: Chat = ai.chats.create({
   },
 });
 
-export const getChatbotResponse = async (message: string): Promise<string> => {
+export interface ChatResponse {
+    text: string;
+    sources: GroundingSource[];
+}
+
+export const getChatbotResponse = async (message: string): Promise<ChatResponse> => {
     try {
         const response = await chat.sendMessage({ message });
-        // The .text property is used directly to access the extracted string output.
-        return response.text || "I'm sorry, I couldn't generate a response.";
+        const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
+        const sources: GroundingSource[] = chunks?.map((chunk: any) => ({
+            title: chunk.web?.title || "Source",
+            uri: chunk.web?.uri
+        })).filter((s: any) => s.uri) || [];
+
+        return { 
+            text: response.text || "I'm sorry, I couldn't generate a response.",
+            sources 
+        };
     } catch (error) {
         console.error("Error with chatbot:", error);
         throw new Error("Failed to get a response from the chatbot. Please try again later.");
@@ -37,7 +49,7 @@ export const analyzeImageForAI = async (base64Image: string, mimeType: string): 
             },
           },
           {
-            text: "Analyze this image for signs of AI generation. Focus on intrinsic features like texture inconsistencies, noise patterns, and known AI artifacts. Ignore lighting conditions like poor or low light. Provide a classification ('AI-generated', 'Authentic', or 'Uncertain'), a confidence score (0-100), and a brief explanation of your reasoning.",
+            text: "Analyze this image for signs of AI generation. Focus on intrinsic features like texture inconsistencies, noise patterns, and known AI artifacts. Provide a classification ('AI-generated', 'Authentic', or 'Uncertain'), a confidence score (0-100), and a brief explanation of your reasoning.",
           },
         ],
       },
@@ -50,16 +62,14 @@ export const analyzeImageForAI = async (base64Image: string, mimeType: string): 
             confidence: { type: Type.INTEGER },
             explanation: { type: Type.STRING }
           },
-          propertyOrdering: ["classification", "confidence", "explanation"],
+          required: ["classification", "confidence", "explanation"]
         }
       }
     });
-    // response.text property directly returns the extracted string.
-    const jsonText = response.text.trim();
-    return JSON.parse(jsonText);
+    return JSON.parse(response.text.trim());
   } catch (error) {
     console.error("Error analyzing image:", error);
-    throw new Error('Failed to analyze image. Please check the image format and try again.');
+    throw new Error('Failed to analyze image. Please try again.');
   }
 };
 
@@ -67,12 +77,12 @@ export const extractArticleTextFromHtml = async (html: string): Promise<string> 
     try {
         const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
-            contents: `From the following HTML content, extract and return ONLY the main article text. Exclude all HTML tags, scripts, styles, navigation bars, sidebars, footers, advertisements, and comment sections. The output should be the clean, plain text of the article's body, suitable for analysis. HTML: "${html.substring(0, 35000)}"`,
+            contents: `Extract the main article text from this HTML, ignoring ads and navigation: "${html.substring(0, 35000)}"`,
         });
         return response.text || "";
     } catch (error) {
-        console.error("Error extracting article text from HTML:", error);
-        throw new Error('Failed to extract article content from the provided URL.');
+        console.error("Error extracting text:", error);
+        throw new Error('Failed to extract article content.');
     }
 };
 
@@ -80,7 +90,7 @@ export const analyzeArticleContent = async (content: string): Promise<any> => {
     try {
         const response: GenerateContentResponse = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
-            contents: `Analyze the following article text. Break it down into key claims. Fact-check each claim against reliable sources. Provide an overall misinformation risk level ('Low', 'Medium', 'High'), a credibility score (0-100), a list of topic tags, a concise summary, and source attribution for your findings. Article content: "${content}"`,
+            contents: `Analyze this article and identify misinformation risk: "${content}"`,
             config: {
                 responseMimeType: 'application/json',
                 responseSchema: {
@@ -101,15 +111,14 @@ export const analyzeArticleContent = async (content: string): Promise<any> => {
                             }
                         }
                     },
-                    propertyOrdering: ["riskLevel", "credibilityScore", "tags", "summary", "claims"],
+                    required: ["riskLevel", "credibilityScore", "summary", "claims"]
                 }
             }
         });
-        const jsonText = response.text.trim();
-        return JSON.parse(jsonText);
+        return JSON.parse(response.text.trim());
     } catch (error) {
         console.error("Error analyzing article:", error);
-        throw new Error('Failed to analyze article. The content may be invalid or the service is down.');
+        throw new Error('Failed to analyze article.');
     }
 };
 
@@ -117,7 +126,7 @@ export const generateAwarenessTemplateText = async (prompt: string): Promise<any
     try {
         const response = await ai.models.generateContent({
             model: "gemini-3-flash-preview",
-            contents: `Generate content for an awareness infographic based on this topic: "${prompt}". Provide a catchy title, 3-4 key bullet points explaining why the content is misleading, and 1-2 safety tips or verified sources. Make it concise and easy to share.`,
+            contents: `Generate an awareness kit for: "${prompt}"`,
             config: {
                 responseMimeType: "application/json",
                 responseSchema: {
@@ -127,26 +136,24 @@ export const generateAwarenessTemplateText = async (prompt: string): Promise<any
                         highlights: { type: Type.ARRAY, items: { type: Type.STRING } },
                         tips: { type: Type.ARRAY, items: { type: Type.STRING } }
                     },
-                    propertyOrdering: ["title", "highlights", "tips"],
+                    required: ["title", "highlights", "tips"]
                 }
             }
         });
-        const jsonText = response.text.trim();
-        return JSON.parse(jsonText);
+        return JSON.parse(response.text.trim());
     } catch (error) {
-        console.error("Error generating template text:", error);
-        throw new Error('Failed to generate template. Please try a different topic.');
+        console.error("Error generating kit:", error);
+        throw new Error('Failed to generate kit.');
     }
 };
 
-export const getTrendingTopics = async (): Promise<{ topic: string; risk: string; score: number }[]> => {
+export const getTrendingTopics = async (): Promise<{ topic: string; risk: string; score: number; sources: GroundingSource[] }[]> => {
     try {
         const response = await ai.models.generateContent({
             model: "gemini-3-flash-preview",
-            contents: "List the top 5 trending misinformation topics or narratives currently circulating online. For each, provide a 'topic' (string title), a 'risk' level ('High', 'Medium', or 'Low'), and a 'score' (number 0-100 for credibility). Respond with a JSON array of objects.",
+            contents: "List top 5 trending misinformation narratives. Respond with a JSON array.",
             config: {
                 tools: [{ googleSearch: {} }],
-                // Using responseSchema to ensure the structure is correct as per guidelines.
                 responseMimeType: "application/json",
                 responseSchema: {
                     type: Type.ARRAY,
@@ -157,55 +164,31 @@ export const getTrendingTopics = async (): Promise<{ topic: string; risk: string
                             risk: { type: Type.STRING },
                             score: { type: Type.INTEGER }
                         },
-                        propertyOrdering: ["topic", "risk", "score"]
+                        required: ["topic", "risk", "score"]
                     }
                 }
             },
         });
 
-        const text = response.text;
-        if (!text) {
-             throw new Error("Received an empty response for trending topics.");
-        }
-        
-        try {
-            // response.text property is used; for Search Grounding, we ensure we handle the output string.
-            const topics = JSON.parse(text);
-            if (Array.isArray(topics)) {
-                 return topics.slice(0, 5);
-            } else {
-                 throw new Error("The service returned an invalid data structure for trending topics.");
-            }
-        } catch (jsonError) {
-            console.error("JSON parsing failed for trending topics:", jsonError, "Raw response text:", text);
-            throw new Error("Could not parse trending topics from the service.");
-        }
+        const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
+        const allSources: GroundingSource[] = chunks?.map((chunk: any) => ({
+            title: chunk.web?.title || "Search Source",
+            uri: chunk.web?.uri
+        })).filter((s: any) => s.uri) || [];
+
+        const topics = JSON.parse(response.text.trim());
+        return topics.map((t: any) => ({ ...t, sources: allSources }));
     } catch (error) {
-        console.error("Error fetching trending topics:", error);
-        if (error instanceof Error && (error.message.includes("Could not parse") || error.message.includes("empty response"))) {
-            throw error;
-        }
-        throw new Error('Failed to fetch trending topics. The online service may be experiencing issues.');
+        console.error("Error fetching trends:", error);
+        throw new Error('Failed to fetch trending topics.');
     }
 };
 
 export const understandVoiceCommand = async (command: string, context: { hasImage: boolean; hasArticle: boolean }): Promise<any> => {
-  const prompt = `
-    You are the voice assistant for CodeHustlers, an AI-powered misinformation detection tool.
-    Your task is to understand the user's voice command and determine their intent and any relevant parameters.
-    Current context:
-    - An image is ${context.hasImage ? 'currently uploaded' : 'not uploaded'}.
-    - An article text/URL is ${context.hasArticle ? 'currently entered' : 'not entered'}.
-
-    Based on the user's command: "${command}", identify the intent: analyze_image, analyze_article, get_trending_topics, generate_template, general_question, greet, unknown.
-    Extract any parameters (article URL or template topic).
-    Respond ONLY with a valid JSON object.
-  `;
-
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: prompt,
+      contents: `User said: "${command}". Context: Image ${context.hasImage ? 'exists' : 'no'}, Article ${context.hasArticle ? 'exists' : 'no'}. Determine intent and parameters.`,
       config: {
         responseMimeType: 'application/json',
         responseSchema: {
@@ -221,37 +204,25 @@ export const understandVoiceCommand = async (command: string, context: { hasImag
             },
             responseText: { type: Type.STRING }
           },
-          propertyOrdering: ["intent", "parameters", "responseText"],
+          required: ["intent", "responseText"]
         }
       }
     });
-    const jsonText = response.text.trim();
-    return JSON.parse(jsonText);
+    return JSON.parse(response.text.trim());
   } catch (error) {
-    console.error("Error understanding voice command:", error);
-    throw new Error("I couldn't understand that command. Could you please rephrase?");
+    console.error("Voice parsing error:", error);
+    throw new Error("I couldn't understand that command.");
   }
 };
 
-
 export const summarizeResultForSpeech = async (resultType: 'image' | 'article', result: any): Promise<string> => {
-  let prompt = '';
-  if (resultType === 'article') {
-    prompt = `Concisely summarize this article analysis result for a voice assistant to speak. Be friendly and direct. Result: Risk Level is ${result.riskLevel}, Credibility Score is ${result.credibilityScore}. Summary: ${result.summary}`;
-  } else if (resultType === 'image') {
-    prompt = `Concisely summarize this image analysis result for a voice assistant to speak. Be friendly and direct. Result: The image is classified as ${result.classification} with ${result.confidence}% confidence. Explanation: ${result.explanation}`;
-  } else {
-    return "The analysis is complete."
-  }
-
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: prompt,
+      contents: `Summarize for voice: ${resultType} analysis result. ${JSON.stringify(result)}`,
     });
-    return response.text || "I have completed the analysis.";
+    return response.text || "Analysis complete.";
   } catch (error) {
-    console.error("Error summarizing result:", error);
-    return "I've completed the analysis for you.";
+    return "The analysis is ready.";
   }
 }

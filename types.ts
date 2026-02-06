@@ -1,4 +1,10 @@
+
 export type Page = 'home' | 'dashboard' | 'faq' | 'contact' | 'login' | 'register' | 'profile';
+
+export interface GroundingSource {
+  title: string;
+  uri: string;
+}
 
 export interface ImageDetectionResult {
   classification: 'AI-generated' | 'Authentic' | 'Uncertain';
