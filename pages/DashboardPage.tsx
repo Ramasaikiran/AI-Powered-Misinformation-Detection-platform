@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import DashboardCard from '../components/DashboardCard';
 import Modal from '../components/Modal';
@@ -28,7 +27,6 @@ const DashboardPage: React.FC = () => {
     ]);
     const recognitionRef = useRef<any>(null);
     const assistantMessagesEndRef = useRef<HTMLDivElement>(null);
-
 
     // Image Detection State
     const [imageFile, setImageFile] = useState<File | null>(null);
@@ -116,7 +114,7 @@ const DashboardPage: React.FC = () => {
 
     // Initialize Speech Recognition
     useEffect(() => {
-        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitRecognition || (window as any).webkitSpeechRecognition;
         if (SpeechRecognition) {
             recognitionRef.current = new SpeechRecognition();
             const recognition = recognitionRef.current;
@@ -159,7 +157,6 @@ const DashboardPage: React.FC = () => {
             return;
         }
 
-        // Proactively check for permissions using the Permissions API.
         if (navigator.permissions) {
             try {
                 const permissionStatus = await navigator.permissions.query({ name: 'microphone' as PermissionName });
@@ -177,7 +174,6 @@ const DashboardPage: React.FC = () => {
                 }
             } catch (error) {
                 console.error("Could not query microphone permission:", error);
-                // If query fails, proceed and let the browser's default behavior handle it.
             }
         }
         
@@ -286,45 +282,29 @@ const DashboardPage: React.FC = () => {
         handleLoading('article', true);
         setArticleResult(null);
 
-        // Regex to find the first valid URL in a block of text
         const urlFindRegex = /(https?:\/\/[^\s"']*[^\s"'\.,])/;
         const urlMatch = trimmedInput.match(urlFindRegex);
         const potentialUrl = urlMatch ? urlMatch[0] : null;
 
         let articleContentToAnalyze = trimmedInput;
-        // Use the URL for history if found, otherwise use a snippet of the text
         let analysisQuery = potentialUrl || (trimmedInput.substring(0, 30) + '...');
 
         try {
             if (potentialUrl) {
                 try {
                     showToast('URL detected. Fetching article content...', 'info');
-                    // Using a CORS proxy to fetch content client-side.
                     const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(potentialUrl)}`;
                     const response = await fetch(proxyUrl);
-
-                    if (!response.ok) {
-                        throw new Error(`Request failed with status ${response.status}`);
-                    }
+                    if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
                     const html = await response.text();
-
-                    if (!html) {
-                         throw new Error(`Fetched content is empty.`);
-                    }
-
+                    if (!html) throw new Error(`Fetched content is empty.`);
                     showToast('Extracting main text from page...', 'info');
                     const extractedText = await extractArticleTextFromHtml(html);
-                    
-                    if (!extractedText.trim()) {
-                        throw new Error("Could not extract any meaningful text from the URL.");
-                    }
+                    if (!extractedText.trim()) throw new Error("Could not extract text from the URL.");
                     articleContentToAnalyze = extractedText;
                 } catch (fetchError) {
-                    const message = fetchError instanceof Error ? fetchError.message : 'An unknown error occurred';
-                    showToast(`Failed to process URL: ${message}. Analyzing the provided text instead.`, 'error');
-                    // Fallback to analyzing the input text directly if fetching/extraction fails
+                    showToast(`Failed to process URL. Analyzing text instead.`, 'error');
                     articleContentToAnalyze = trimmedInput;
-                    analysisQuery = trimmedInput.substring(0, 30) + '...';
                 }
             }
             
@@ -338,9 +318,6 @@ const DashboardPage: React.FC = () => {
         } catch (err) {
             const message = err instanceof Error ? err.message : 'An unknown error occurred.';
             showToast(message, 'error');
-            if (fromVoice) {
-                addAssistantMessage('bot', 'Sorry, I encountered an error while analyzing the article.', true);
-            }
         } finally {
             handleLoading('article', false);
         }
@@ -354,8 +331,7 @@ const DashboardPage: React.FC = () => {
             const result = await generateAwarenessTemplateText(templatePrompt);
             setTemplateContent(result);
         } catch (err) {
-            const message = err instanceof Error ? err.message : 'An unknown error occurred.';
-            showToast(message, 'error');
+            showToast(err instanceof Error ? err.message : 'An unknown error occurred.', 'error');
         } finally {
             handleLoading('template', false);
         }
@@ -373,8 +349,10 @@ const DashboardPage: React.FC = () => {
     };
 
     const clearHistory = () => {
-        if (window.confirm('Are you sure you want to clear your analysis history? This cannot be undone.')) {
+        if (userHistory.length === 0) return;
+        if (window.confirm('Are you sure you want to clear your entire analysis history? This action cannot be undone.')) {
             setUserHistory([]);
+            localStorage.removeItem('codeHustlersHistory');
             showToast('History cleared successfully.', 'success');
         }
     };
@@ -382,140 +360,27 @@ const DashboardPage: React.FC = () => {
     const handleDownloadInfographic = () => {
         const node = infographicRef.current;
         if (!node || !templateContent) return;
-    
-        // --- Configuration ---
-        const scaleFactor = 2; // For higher resolution output
-        const padding = 20;
-        const { width } = node.getBoundingClientRect();
-        const contentWidth = width - padding * 2;
-        const fonts = {
-            title: 'bold 20px sans-serif',
-            highlight: '14px sans-serif',
-            tip: 'italic 12px sans-serif',
-        };
-        const lineHeights = { title: 25, highlight: 20, tip: 18 };
-        const margins = { afterTitle: 15, afterHighlights: 10 };
-        
-        // Determine colors based on theme for the export
-        const isDarkMode = document.documentElement.classList.contains('dark');
-        const colors = {
-            background: isDarkMode ? '#000000' : '#ffffff',
-            title: '#4f46e5',      // indigo-600
-            highlight: isDarkMode ? '#ffffff' : '#000000',
-            tip: isDarkMode ? '#ffffffaa' : '#000000aa',
-        };
-        
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
-    
-        // --- Helper to measure height of wrapped text ---
-        const measureTextHeight = (text: string, font: string, lineHeight: number): number => {
-            ctx.font = font;
-            const words = text.split(' ');
-            let line = '';
-            let y = lineHeight; // Start with one line's height
-            for (const word of words) {
-                const testLine = line + word + ' ';
-                if (ctx.measureText(testLine).width > contentWidth && line.length > 0) {
-                    y += lineHeight;
-                    line = word + ' ';
-                } else {
-                    line = testLine;
-                }
-            }
-            return y;
-        };
-    
-        // --- 1. Calculate total height required ---
-        let totalHeight = padding;
-        totalHeight += measureTextHeight(templateContent.title, fonts.title, lineHeights.title);
-        totalHeight += margins.afterTitle;
-        templateContent.highlights.forEach(h => {
-            totalHeight += measureTextHeight(`• ${h}`, fonts.highlight, lineHeights.highlight);
-        });
-        totalHeight += margins.afterHighlights;
-        templateContent.tips.forEach(t => {
-            totalHeight += measureTextHeight(t, fonts.tip, lineHeights.tip);
-        });
-        totalHeight += padding;
         
-        // --- 2. Set final canvas dimensions and styles ---
-        canvas.width = width * scaleFactor;
-        canvas.height = totalHeight * scaleFactor;
+        canvas.width = 600;
+        canvas.height = 400;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, 600, 400);
+        ctx.fillStyle = '#4f46e5';
+        ctx.font = 'bold 24px sans-serif';
+        ctx.fillText(templateContent.title, 40, 60);
+        ctx.fillStyle = '#000000';
+        ctx.font = '16px sans-serif';
+        templateContent.highlights.forEach((h, i) => ctx.fillText(`• ${h}`, 40, 100 + (i * 30)));
         
-        ctx.fillStyle = colors.background;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.scale(scaleFactor, scaleFactor);
-        ctx.textBaseline = 'top'; // Crucial for accurate Y positioning
-    
-        // --- Helper to draw wrapped text ---
-        const drawWrappedText = (text: string, x: number, y: number, font: string, lineHeight: number, color: string): number => {
-            ctx.font = font;
-            ctx.fillStyle = color;
-            const words = text.split(' ');
-            let line = '';
-            let currentY = y;
-            for (const word of words) {
-                const testLine = line + word + ' ';
-                if (ctx.measureText(testLine).width > contentWidth && line.length > 0) {
-                    ctx.fillText(line.trim(), x, currentY);
-                    currentY += lineHeight;
-                    line = word + ' ';
-                } else {
-                    line = testLine;
-                }
-            }
-            ctx.fillText(line.trim(), x, currentY);
-            return currentY + lineHeight; // Return Y position for the *next* element
-        };
-    
-        // --- 3. Perform drawing ---
-        let currentY = padding;
-        currentY = drawWrappedText(templateContent.title, padding, currentY, fonts.title, lineHeights.title, colors.title);
-        currentY += margins.afterTitle;
-        templateContent.highlights.forEach(h => {
-            currentY = drawWrappedText(`• ${h}`, padding, currentY, fonts.highlight, lineHeights.highlight, colors.highlight);
-        });
-        currentY += margins.afterHighlights;
-        templateContent.tips.forEach(t => {
-            currentY = drawWrappedText(t, padding, currentY, fonts.tip, lineHeights.tip, colors.tip);
-        });
-    
-        // --- 4. Trigger Download ---
         const link = document.createElement('a');
-        link.download = 'CodeHustlers-Awareness-Card.png';
+        link.download = 'awareness-card.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
     };
 
-    const getShareText = () => {
-        if (!templateContent) return '';
-        const { title, highlights, tips } = templateContent;
-        const highlightsText = highlights.map(h => `• ${h}`).join('\n');
-        const tipsText = tips.join('\n');
-        return `${title}\n\n${highlightsText}\n\nKey Tips:\n${tipsText}\n\nAnalyzed with #CodeHustlers`;
-    };
-
-    const handleShare = (platform: 'whatsapp' | 'facebook') => {
-        const text = getShareText();
-        const encodedText = encodeURIComponent(text);
-        let url = '';
-        if (platform === 'whatsapp') {
-            url = `https://api.whatsapp.com/send?text=${encodedText}`;
-        } else if (platform === 'facebook') {
-            // A placeholder URL is needed for the sharer.php link. The main content is in the quote.
-            const placeholderUrl = 'https://ai.google.dev';
-            url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(placeholderUrl)}&quote=${encodedText}`;
-        }
-        window.open(url, '_blank', 'noopener,noreferrer');
-    };
-
-    const handleInstagramShare = () => {
-        showToast('First download the image, then share it on Instagram!', 'info');
-    };
-    
     return (
         <div className="animate-fade-in-up">
             <h1 className="text-3xl font-bold mb-8 text-center text-black dark:text-white">AI Detection Suite</h1>
@@ -539,4 +404,179 @@ const DashboardPage: React.FC = () => {
                             <button
                                 onClick={toggleListening}
                                 disabled={isLoading['voice']}
-                                className={`relative w-20 h-20 mx-auto flex items-center justify-center p-2 rounded-full transition-colors text-white font-bold ${isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-indigo-600 hover:bg-indigo-700'} disabled:bg-gray-400
+                                className={`relative w-16 h-16 mx-auto flex items-center justify-center p-2 rounded-full transition-colors text-white font-bold ${isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-indigo-600 hover:bg-indigo-700'} disabled:bg-gray-400`}
+                            >
+                                {isLoading['voice'] ? <span className="animate-pulse">...</span> : ICONS.mic}
+                                {isListening && <span className="absolute inset-0 rounded-full bg-red-500/30 animate-ping"></span>}
+                            </button>
+                        </div>
+                    </div>
+                </DashboardCard>
+
+                {/* Image Detection */}
+                <DashboardCard title="AI Image Detection" icon={ICONS.image}>
+                    <div className="space-y-4">
+                        <div 
+                            className="border-2 border-dashed border-black/20 dark:border-white/20 rounded-xl p-4 text-center hover:border-indigo-500 transition-colors cursor-pointer relative"
+                            onClick={() => document.getElementById('image-upload')?.click()}
+                        >
+                            {imagePreview ? (
+                                <div className="relative group">
+                                    <img src={imagePreview} alt="Preview" className="h-32 w-full object-contain rounded-lg" />
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); resetImageAnalysis(); }}
+                                        className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="py-4">
+                                    <p className="text-sm text-black/60 dark:text-white/60">Drop image here or click to upload</p>
+                                </div>
+                            )}
+                            <input id="image-upload" type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
+                        </div>
+                        <button 
+                            onClick={() => handleImageDetect()}
+                            disabled={!imageFile || isLoading['image']}
+                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg transition disabled:bg-gray-400"
+                        >
+                            {isLoading['image'] ? 'Analyzing...' : 'Analyze Image'}
+                        </button>
+                        {imageResult && (
+                            <div className="mt-4 p-3 bg-black/5 dark:bg-white/5 rounded-lg border border-indigo-500/20">
+                                <p className="font-bold flex justify-between">
+                                    Result: <span className={imageResult.classification === 'Authentic' ? 'text-green-500' : 'text-red-500'}>{imageResult.classification}</span>
+                                </p>
+                                <p className="text-sm mt-1">{imageResult.explanation}</p>
+                            </div>
+                        )}
+                    </div>
+                </DashboardCard>
+
+                {/* Article Analysis */}
+                <DashboardCard title="Article Analysis" icon={ICONS.article}>
+                    <div className="space-y-4">
+                        <textarea 
+                            value={articleInput}
+                            onChange={(e) => setArticleInput(e.target.value)}
+                            placeholder="Paste article URL or content here..."
+                            className="w-full h-24 bg-transparent border border-black/20 dark:border-white/20 rounded-lg p-2 text-sm focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                        />
+                        <button 
+                            onClick={() => handleArticleDetect()}
+                            disabled={!articleInput.trim() || isLoading['article']}
+                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg transition disabled:bg-gray-400"
+                        >
+                            {isLoading['article'] ? 'Checking...' : 'Check Article'}
+                        </button>
+                        {articleResult && (
+                            <div className="mt-2 p-3 bg-black/5 dark:bg-white/5 rounded-lg text-sm border border-indigo-500/20">
+                                <p className="font-bold">Risk: {articleResult.riskLevel}</p>
+                                <p className="mt-1 line-clamp-3">{articleResult.summary}</p>
+                                <button 
+                                    onClick={() => setModalInfo({ isOpen: true, title: 'Full Analysis', content: <div>{articleResult.claims.map((c, i) => <div key={i} className="mb-4"><strong>{c.claim}</strong><p className="text-sm mt-1">{c.verification}</p></div>)}</div> })}
+                                    className="text-indigo-500 text-xs mt-2 font-bold"
+                                >
+                                    View Full Breakdown
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </DashboardCard>
+
+                {/* Trending Topics */}
+                <DashboardCard title="Trending Risks" icon={ICONS.trending}>
+                    <div className="h-56 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600">
+                        {isLoading['trending'] ? (
+                            <div className="flex flex-col space-y-2">
+                                {[1, 2, 3].map(i => <div key={i} className="h-10 bg-black/5 dark:bg-white/5 animate-pulse rounded"></div>)}
+                            </div>
+                        ) : trendingTopics.map((topic, idx) => (
+                            <div key={idx} className="flex justify-between items-center p-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
+                                <span className="text-sm font-medium flex-1 truncate mr-2" title={topic.topic}>{topic.topic}</span>
+                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${topic.risk === 'High' ? 'bg-red-500/20 text-red-500' : 'bg-yellow-500/20 text-yellow-500'}`}>
+                                    {topic.risk}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </DashboardCard>
+
+                {/* Awareness Templates */}
+                <DashboardCard title="Awareness Tools" icon={ICONS.template}>
+                    <div className="space-y-4">
+                        <input 
+                            value={templatePrompt}
+                            onChange={(e) => setTemplatePrompt(e.target.value)}
+                            placeholder="Enter a topic..."
+                            className="w-full bg-transparent border border-black/20 dark:border-white/20 rounded-lg p-2 text-sm focus:outline-none"
+                        />
+                        <button 
+                            onClick={handleTemplateGenerate}
+                            disabled={!templatePrompt.trim() || isLoading['template']}
+                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg transition disabled:bg-gray-400"
+                        >
+                            {isLoading['template'] ? 'Generating...' : 'Create Awareness Kit'}
+                        </button>
+                        {templateContent && (
+                            <div className="mt-2 text-center">
+                                <button onClick={() => setModalInfo({ isOpen: true, title: 'Awareness Kit', content: <div className="space-y-4"><h4 className="font-bold text-lg">{templateContent.title}</h4>{templateContent.highlights.map((h, i) => <p key={i}>• {h}</p>)}<button onClick={handleDownloadInfographic} className="w-full bg-indigo-600 text-white py-2 rounded-lg mt-4">Download Image</button></div> })} className="text-indigo-500 text-sm font-bold">View Results</button>
+                            </div>
+                        )}
+                    </div>
+                </DashboardCard>
+
+                {/* User Insights */}
+                <DashboardCard title="User Insights" icon={ICONS.insights}>
+                    <div className="h-56 flex flex-col justify-between">
+                        <div>
+                            <div className="flex justify-between items-center mb-4">
+                                <h4 className="text-sm font-bold uppercase text-black/50 dark:text-white/50">Recent Activity</h4>
+                                {userHistory.length > 0 && (
+                                    <button 
+                                        onClick={clearHistory}
+                                        className="text-xs text-red-500 hover:text-red-600 font-semibold tracking-wider uppercase transition-colors"
+                                    >
+                                        Clear History
+                                    </button>
+                                )}
+                            </div>
+                            <div className="space-y-2 overflow-y-auto h-32 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 pr-1">
+                                {userHistory.length === 0 ? (
+                                    <p className="text-sm text-center text-black/40 py-4 italic">No activity yet.</p>
+                                ) : (
+                                    userHistory.map(item => (
+                                        <div key={item.id} className="text-xs p-2 bg-black/5 dark:bg-white/5 rounded-lg flex justify-between items-center border border-transparent hover:border-black/5">
+                                            <span className="truncate flex-1 mr-2" title={item.query}>{item.query}</span>
+                                            <span className="text-indigo-500 font-bold px-1.5 py-0.5 rounded bg-indigo-500/10 uppercase text-[9px]">{item.type}</span>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                        <div className="pt-2 border-t border-black/10 dark:border-white/10 flex items-center justify-between">
+                             <div className="flex items-center">
+                                <div className={`p-2 rounded-full mr-3 ${truthBadgeEarned ? 'bg-green-500 text-white animate-pulse' : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M2.166 4.9L9.03 9.069a2 2 0 001.94 0L17.834 4.9A2 2 0 0016.864 1.5H3.136a2 2 0 00-.97 3.4zM3.508 11.5A3 3 0 016.5 8.5h7a3 3 0 012.992 3L16.5 19H3.5l.008-7.5z" clipRule="evenodd" /></svg>
+                                </div>
+                                <span className="text-xs font-bold">{truthBadgeEarned ? 'Truth Seeker Badge Earned!' : `Badge: ${Math.max(0, 5 - userHistory.length)} more needed`}</span>
+                             </div>
+                        </div>
+                    </div>
+                </DashboardCard>
+            </div>
+
+            <Modal 
+                isOpen={modalInfo.isOpen} 
+                onClose={() => setModalInfo(prev => ({ ...prev, isOpen: false }))} 
+                title={modalInfo.title}
+            >
+                {modalInfo.content}
+            </Modal>
+        </div>
+    );
+};
+
+export default DashboardPage;
