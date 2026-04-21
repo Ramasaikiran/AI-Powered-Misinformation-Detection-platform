@@ -59,7 +59,7 @@ export default async function handler(req: any, res: any) {
             }
           }
         });
-        return res.status(200).json(JSON.parse(response.text.trim()));
+        return res.status(200).json(JSON.parse(response.text?.trim() || "{}"));
     }
 
     if (action === 'extractArticleText') {
@@ -98,7 +98,7 @@ export default async function handler(req: any, res: any) {
                 }
             }
         });
-        return res.status(200).json(JSON.parse(response.text.trim()));
+        return res.status(200).json(JSON.parse(response.text?.trim() || "{}"));
     }
 
     if (action === 'generateTemplate') {
@@ -118,7 +118,7 @@ export default async function handler(req: any, res: any) {
                 }
             }
         });
-        return res.status(200).json(JSON.parse(response.text.trim()));
+        return res.status(200).json(JSON.parse(response.text?.trim() || "{}"));
     }
 
     if (action === 'getTrendingTopics') {
@@ -149,7 +149,7 @@ export default async function handler(req: any, res: any) {
             uri: chunk.web?.uri
         })).filter((s: any) => s.uri) || [];
 
-        const topics = JSON.parse(response.text.trim());
+        const topics = JSON.parse(response.text?.trim() || "{}");
         return res.status(200).json(topics.map((t: any) => ({ ...t, sources: allSources })));
     }
 
@@ -176,7 +176,7 @@ export default async function handler(req: any, res: any) {
             }
           }
         });
-        return res.status(200).json(JSON.parse(response.text.trim()));
+        return res.status(200).json(JSON.parse(response.text?.trim() || "{}"));
     }
 
     if (action === 'summarizeResultForSpeech') {
