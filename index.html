@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- SEO Meta Tags -->
+    <title>KRONOSX AI - Intelligent Misinformation & Fake News Detection Suite</title>
+    <meta name="description" content="KRONOSX AI is an enterprise-grade NLP and ML-powered credibility assessment platform. Scan, analyze, and track digital credibility, deepfakes, and trending misinformation in real-time." />
+    <meta name="keywords" content="misinformation detection, fake news detector, AI verification, NLP claims verification, deepfake detector" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              heading: ['Outfit', 'sans-serif'],
+            },
+            colors: {
+              cyber: {
+                black: '#030303',
+                dark: '#080710',
+                blue: '#00f0ff',
+                purple: '#bd00ff',
+                neonRed: '#ff0055',
+                cyan: '#00e5ff'
+              }
+            },
+            animation: {
+              'pulse-slow': 'pulse-slow 8s infinite',
+              'float': 'float 6s ease-in-out infinite',
+              'glow-shift': 'glow-shift 10s linear infinite animate-pulse',
+            }
+          }
+        }
+      }
+    </script>
+    
+    <!-- Importmap for CDN Packages -->
+    <script type="importmap">
+    {
+      "imports": {
+        "react/": "https://aistudiocdn.com/react@^19.1.1/",
+        "react": "https://aistudiocdn.com/react@^19.1.1",
+        "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+        "react-dom": "https://aistudiocdn.com/react-dom@^19.1.1",
+        "@google/genai": "https://aistudiocdn.com/@google/genai@^1.16.0"
+      }
+    }
+    </script>
+
+    <!-- Custom Premium Styles -->
+    <style>
+      /* Smooth transitions for theme toggle */
+      * {
+        transition: color 0.25s ease-in-out, background-color 0.25s ease-in-out, border-color 0.25s ease-in-out;
+      }
+      
+      body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background-color: #030303;
+        overflow-x: hidden;
+      }
+
+      /* Premium Glassmorphism */
+      .glass {
+        background: rgba(8, 7, 16, 0.65);
+        backdrop-filter: blur(14px) saturate(180%);
+        -webkit-backdrop-filter: blur(14px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .dark .glass {
+        background: rgba(8, 7, 16, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .light .glass {
+        background: rgba(255, 255, 255, 0.65);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+      }
+
+      .glass-card {
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .glass-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(0, 240, 255, 0.25);
+        box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.15), 0 0 20px -5px rgba(189, 0, 255, 0.1);
+      }
+
+      /* Glowing Texts and Borders */
+      .glow-text-cyan {
+        text-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+      }
+      .glow-text-purple {
+        text-shadow: 0 0 15px rgba(189, 0, 255, 0.4);
+      }
+      
+      /* Tech Grid Background Overlay */
+      .grid-overlay {
+        background-size: 40px 40px;
+        background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                          linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      }
+      .light .grid-overlay {
+        background-image: linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+                          linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+      }
+      
+      /* Futuristic Radial Glow */
+      .radial-glow-cyan {
+        background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, transparent 70%);
+      }
+      .radial-glow-purple {
+        background: radial-gradient(circle, rgba(189, 0, 255, 0.12) 0%, transparent 70%);
+      }
+
+      /* Animations */
+      @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-10px) rotate(1deg); }
+      }
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+      .animate-float-delayed {
+        animation: float 6s ease-in-out infinite;
+        animation-delay: 2.5s;
+      }
+
+      @keyframes pulse-slow {
+        0%, 100% { opacity: 0.3; transform: scale(1); }
+        50% { opacity: 0.6; transform: scale(1.05); }
+      }
+      .animate-pulse-slow {
+        animation: pulse-slow 8s ease-in-out infinite;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: rgba(3, 3, 3, 0.95);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 240, 255, 0.3);
+      }
+
+      /* Hide native maps */
+      iframe {
+        filter: invert(90%) hue-rotate(180deg) brightness(95%);
+      }
+    </style>
+  </head>
+  <body class="bg-cyber-black text-white selection:bg-cyan-500/30 selection:text-white">
+    <div id="root"></div>
+  </body>
+</html>
