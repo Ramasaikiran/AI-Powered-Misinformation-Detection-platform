@@ -65,7 +65,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onNavigate, user, onLogout 
                 <div className="absolute inset-0 rounded-xl bg-cyan-400 opacity-0 group-hover:opacity-30 blur transition-opacity duration-300"></div>
               </div>
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70 group-hover:text-cyan-400 transition-colors duration-300 font-heading">
-                KRONOSX <span className="text-cyan-400 font-light">AI</span>
+                Code <span className="text-cyan-400 font-light">Hustlers</span>
               </span>
             </button>
           </div>

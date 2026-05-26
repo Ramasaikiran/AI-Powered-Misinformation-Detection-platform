@@ -13,7 +13,7 @@ interface Message {
 const Chatbot: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
-        { text: "KRONOSX AI live agent telemetry initialized. Ask me anything about narrative integrity or platform features.", sender: 'bot' }
+        { text: "Code Hustlers live agent telemetry initialized. Ask me anything about narrative integrity or platform features.", sender: 'bot' }
     ]);
     const [userInput, setUserInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -76,7 +76,7 @@ const Chatbot: React.FC = () => {
                     <div className="flex justify-between items-center px-6 py-4 bg-white/5 border-b border-white/5">
                         <div className="flex items-center space-x-2">
                           <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(0,240,255,1)]"></span>
-                          <h3 className="font-heading font-black text-sm tracking-widest text-white uppercase">KRONOSX AI Agent</h3>
+                          <h3 className="font-heading font-black text-sm tracking-widest text-white uppercase">Code Hustlers Agent</h3>
                         </div>
                         <button onClick={() => setIsOpen(false)} className="text-white/40 hover:text-white transition-colors text-lg font-bold">&times;</button>
                     </div>

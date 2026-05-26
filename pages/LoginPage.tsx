@@ -27,7 +27,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onSwitchToRegister }) =>
   
   const handleGoogleSignIn = () => {
     setError('');
-    onLogin({ identifier: 'admin@kronosx.ai' });
+    onLogin({ identifier: 'admin@codehustlers.com' });
   };
 
   return (

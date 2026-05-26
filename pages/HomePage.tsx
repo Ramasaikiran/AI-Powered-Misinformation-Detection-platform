@@ -12,13 +12,13 @@ const HomePage: React.FC<HomePageProps> = ({ user, onNavigateToDashboard }) => {
 
   const testimonials = [
     {
-      quote: "KRONOSX AI has completely revolutionized our content integrity audits. We process millions of text blocks with near-zero latency, flagging coordinated bot networks instantly.",
+      quote: "Code Hustlers has completely revolutionized our content integrity audits. We process millions of text blocks with near-zero latency, flagging coordinated bot networks instantly.",
       author: "Dr. Elena Rostova",
       role: "Director of Integrity Research, Global Communications Institute",
       avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop"
     },
     {
-      quote: "As an enterprise news publisher, credibility is our currency. KRONOSX provides our editorial team with instant claims verification, serving as a trusted line of defense.",
+      quote: "As an enterprise news publisher, credibility is our currency. Code Hustlers provides our editorial team with instant claims verification, serving as a trusted line of defense.",
       author: "Marcus Vance",
       role: "VP of News Integrity, Axiom Syndicate Press",
       avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=150&auto=format&fit=crop"
@@ -53,7 +53,7 @@ const HomePage: React.FC<HomePageProps> = ({ user, onNavigateToDashboard }) => {
           {/* Futuristic Badge */}
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-cyan-400/20 bg-cyan-950/20 text-cyan-400 text-xs font-bold uppercase tracking-widest animate-pulse">
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(0,240,255,1)]"></span>
-            <span>KRONOSX AI Generative V2.5 Ready</span>
+            <span>Code Hustlers Generative V2.5 Ready</span>
           </div>
 
           <h1 className="text-5xl md:text-8xl font-black font-heading tracking-tight leading-none text-white">
@@ -64,7 +64,7 @@ const HomePage: React.FC<HomePageProps> = ({ user, onNavigateToDashboard }) => {
           </h1>
 
           <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto font-sans leading-relaxed">
-            Harness the power of KRONOSX AI's advanced NLP pipelines, Vision Transformers, and live narrative indexing. Detect manipulated media, evaluate article authenticity, and audit global credibility threats in under 120 milliseconds.
+            Harness the power of Code Hustlers' advanced NLP pipelines, Vision Transformers, and live narrative indexing. Detect manipulated media, evaluate article authenticity, and audit global credibility threats in under 120 milliseconds.
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
@@ -309,20 +309,20 @@ const HomePage: React.FC<HomePageProps> = ({ user, onNavigateToDashboard }) => {
           
           {[
             {
-              question: "What is KRONOSX AI credibility engine?",
-              answer: "KRONOSX AI is a secure enterprise platform parsing media authenticity in real-time. We combine neural NLP factual matching pipelines with sophisticated machine learning image matrices to shield organizations from digital misinformation threats."
+              question: "What is Code Hustlers credibility engine?",
+              answer: "Code Hustlers is a secure enterprise platform parsing media authenticity in real-time. We combine neural NLP factual matching pipelines with sophisticated machine learning image matrices to shield organizations from digital misinformation threats."
             },
             {
               question: "How does deepfake authenticity auditing work?",
               answer: "Our vision pipeline checks uploaded image headers for binary abnormalities, searches color channel pixel layouts for visual artifact patterns, and measures high-frequency noise distributions to flag AI generative signatures."
             },
             {
-              question: "Does KRONOSX protect user privacy?",
+              question: "Does Code Hustlers protect user privacy?",
               answer: "Factual statements are evaluated in completely encrypted memory streams. Uploaded media is securely parsed, verified, and cleared, leaving zero digital footprints behind. Your historical logs are saved exclusively within your browser's local sandbox storage."
             },
             {
               question: "Can I connect third-party platforms via API?",
-              answer: "Yes. KRONOSX AI is designed for seamless REST API integration. Enterprise accounts receive dedicated developer endpoints to audit massive content arrays with robust SLAs."
+              answer: "Yes. Code Hustlers is designed for seamless REST API integration. Enterprise accounts receive dedicated developer endpoints to audit massive content arrays with robust SLAs."
             }
           ].map((faq, idx) => (
             <div key={idx} className="border-b border-white/5 py-5 last:border-0">

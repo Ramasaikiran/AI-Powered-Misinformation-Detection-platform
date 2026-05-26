@@ -10,14 +10,14 @@ const Footer: React.FC = () => {
           {/* Left: Brand Signature */}
           <div className="flex items-center space-x-2">
             <span className="text-lg font-black font-heading tracking-wider text-white">
-              KRONOSX <span className="text-cyan-400 font-light">AI</span>
+              Code <span className="text-cyan-400 font-light">Hustlers</span>
             </span>
             <span className="text-xs text-white/30">| Enterprise Credibility Engine</span>
           </div>
 
           {/* Center: Copyright */}
           <div className="text-center text-sm text-white/40">
-            <p>© {new Date().getFullYear()} KRONOSX AI. Securely processed via advanced NLP.</p>
+            <p>© {new Date().getFullYear()} Code Hustlers. Securely processed via advanced NLP.</p>
           </div>
 
           {/* Right: Premium Tech Icons */}

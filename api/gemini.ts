@@ -8,7 +8,7 @@ export default async function handler(req: any, res: any) {
   // 1. Production API Key Validation & Safety
   const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
   if (!apiKey) {
-    console.error("KRONOSX AI Error: GEMINI_API_KEY is not configured in environment variables.");
+    console.error("Code Hustlers Error: GEMINI_API_KEY is not configured in environment variables.");
     return res.status(500).json({ 
       error: "API key not configured.", 
       details: "The GEMINI_API_KEY environment variable is missing. Please add it to your server deployment environment, or define a local VITE_GEMINI_API_KEY in your .env file." 
@@ -24,7 +24,7 @@ export default async function handler(req: any, res: any) {
         const chat = ai.chats.create({
           model: 'gemini-2.5-flash',
           config: {
-            systemInstruction: 'You are a friendly and helpful chatbot for the KRONOSX AI platform. Your purpose is to answer user questions about the features of the site and provide general information about misinformation and fake news by searching the web when necessary. Keep your answers concise, authoritative, and easy to understand.',
+            systemInstruction: 'You are a friendly and helpful chatbot for the Code Hustlers platform. Your purpose is to answer user questions about the features of the site and provide general information about misinformation and fake news by searching the web when necessary. Keep your answers concise, authoritative, and easy to understand.',
             tools: [{ googleSearch: {} }],
           },
         });
@@ -207,7 +207,7 @@ export default async function handler(req: any, res: any) {
 
     return res.status(400).json({ message: 'Invalid action' });
   } catch (error: any) {
-    console.error("KRONOSX Serverless Function Error:", error);
+    console.error("Code Hustlers Serverless Function Error:", error);
     return res.status(500).json({ error: error?.message || 'Server error' });
   }
 }

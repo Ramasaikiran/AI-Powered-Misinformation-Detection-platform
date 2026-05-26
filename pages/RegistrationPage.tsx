@@ -107,7 +107,7 @@ const RegistrationPage: React.FC<RegistrationPageProps> = ({ onRegister, onSwitc
             </h2>
             <p className="text-xs text-white/50">
               {registrationStep === 'details' 
-                ? 'Register your telemetry identity inside KRONOSX.' 
+                ? 'Register your telemetry identity inside Code Hustlers.' 
                 : 'Confirm node identity using the OTP code generated below.'}
             </p>
          </div>
