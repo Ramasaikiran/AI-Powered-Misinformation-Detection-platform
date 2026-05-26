@@ -144,7 +144,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateProfile, onLogo
               onClick={onLogout} 
               className="w-full sm:w-auto bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 font-extrabold text-xs uppercase tracking-widest py-3 px-6 rounded-xl transition-all"
             >
-                Terminate Session
+                Logout
             </button>
         </div>
       </div>
