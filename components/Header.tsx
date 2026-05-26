@@ -45,7 +45,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onNavigate, user, onLogout 
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'bg-cyber-black/75 dark:bg-cyber-black/75 backdrop-blur-md border-b border-white/5 py-3 shadow-lg' 
+          ? 'bg-white/85 dark:bg-cyber-black/75 backdrop-blur-md border-b border-slate-200 dark:border-white/5 py-3 shadow-lg' 
           : 'bg-transparent py-5'
       }`}
     >
@@ -56,7 +56,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onNavigate, user, onLogout 
           <div className="flex items-center">
             <button 
               onClick={() => onNavigate(isLoggedIn ? 'home' : 'login')} 
-              className="flex-shrink-0 text-white text-2xl font-black font-heading flex items-center tracking-wider group focus:outline-none"
+              className="flex-shrink-0 text-slate-900 dark:text-white text-2xl font-black font-heading flex items-center tracking-wider group focus:outline-none"
             >
               <div className="relative mr-3 w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 shadow-[0_0_20px_rgba(0,240,255,0.4)] group-hover:scale-105 transition-transform duration-300">
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -64,8 +64,8 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onNavigate, user, onLogout 
                 </svg>
                 <div className="absolute inset-0 rounded-xl bg-cyan-400 opacity-0 group-hover:opacity-30 blur transition-opacity duration-300"></div>
               </div>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70 group-hover:text-cyan-400 transition-colors duration-300 font-heading">
-                Code <span className="text-cyan-400 font-light">Hustlers</span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900/70 dark:from-white dark:via-white dark:to-white/70 group-hover:text-cyan-500 dark:group-hover:text-cyan-400 transition-colors duration-300 font-heading">
+                Code <span className="text-cyan-500 dark:text-cyan-400 font-light">Hustlers</span>
               </span>
             </button>
           </div>
@@ -77,7 +77,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onNavigate, user, onLogout 
                 <button
                   key={link.name}
                   onClick={() => onNavigate(link.page)}
-                  className="relative text-white/70 hover:text-cyan-400 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-white/5 active:scale-95"
+                  className="relative text-slate-700 dark:text-white/70 hover:text-cyan-600 dark:hover:text-cyan-400 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-slate-100 dark:hover:bg-white/5 active:scale-95"
                 >
                   {link.name}
                 </button>
@@ -89,7 +89,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onNavigate, user, onLogout 
               <div className="relative" ref={dropdownRef}>
                 <button 
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)} 
-                  className="flex items-center space-x-3 p-1.5 rounded-full hover:bg-white/5 border border-transparent hover:border-white/10 transition-all duration-300 focus:outline-none"
+                  className="flex items-center space-x-3 p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent hover:border-slate-200 dark:hover:border-white/10 transition-all duration-300 focus:outline-none"
                 >
                   {user.profileImageUrl ? (
                     <img src={user.profileImageUrl} alt="Profile" className="w-8 h-8 rounded-full object-cover border border-cyan-400/30" />
@@ -98,36 +98,36 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onNavigate, user, onLogout 
                       {getInitials(user.name)}
                     </span>
                   )}
-                  <span className="hidden sm:inline text-sm font-medium text-white/90">{user.name}</span>
-                  <svg className={`w-4 h-4 text-white/60 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <span className="hidden sm:inline text-sm font-medium text-slate-800 dark:text-white/90">{user.name}</span>
+                  <svg className={`w-4 h-4 text-slate-500 dark:text-white/60 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                   </svg>
                 </button>
                 
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-3 w-52 glass dark:glass rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] py-2 border border-white/10 z-50 animate-float">
-                    <div className="px-4 py-2 border-b border-white/5">
-                      <p className="text-xs text-white/40 uppercase tracking-widest font-bold">Authorized Account</p>
-                      <p className="text-sm font-bold text-white truncate">{user.name}</p>
+                  <div className="absolute right-0 mt-3 w-52 glass dark:glass rounded-2xl shadow-xl py-2 border border-slate-200 dark:border-white/10 z-50 animate-float">
+                    <div className="px-4 py-2 border-b border-slate-100 dark:border-white/5">
+                      <p className="text-xs text-slate-500 dark:text-white/40 uppercase tracking-widest font-bold">Authorized Account</p>
+                      <p className="text-sm font-bold text-slate-800 dark:text-white truncate">{user.name}</p>
                     </div>
                     <button 
                       onClick={() => { onNavigate('profile'); setIsDropdownOpen(false); }} 
-                      className="w-full text-left px-4 py-2.5 text-sm text-white/80 hover:text-cyan-400 hover:bg-white/5 flex items-center space-x-2 transition-colors"
+                      className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-white/80 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-slate-100 dark:hover:bg-white/5 flex items-center space-x-2 transition-colors"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                       <span>Security Profile</span>
                     </button>
                     <button 
                       onClick={() => { onNavigate('dashboard'); setIsDropdownOpen(false); }} 
-                      className="w-full text-left px-4 py-2.5 text-sm text-white/80 hover:text-cyan-400 hover:bg-white/5 flex items-center space-x-2 transition-colors"
+                      className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-white/80 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-slate-100 dark:hover:bg-white/5 flex items-center space-x-2 transition-colors"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2-0 012-2h2a2 2-0 012 2v2a2 2-0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                       <span>Control Console</span>
                     </button>
-                    <div className="border-t border-white/5 my-1"></div>
+                    <div className="border-t border-slate-100 dark:border-white/5 my-1"></div>
                     <button 
                       onClick={() => { onLogout(); setIsDropdownOpen(false); }} 
-                      className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 flex items-center space-x-2 transition-colors font-medium"
+                      className="w-full text-left px-4 py-2.5 text-sm text-red-500 dark:text-red-400 hover:bg-red-500/10 flex items-center space-x-2 transition-colors font-medium"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                       <span>Terminate Session</span>
@@ -143,7 +143,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onNavigate, user, onLogout 
             {isLoggedIn && (
               <button 
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
-                className="text-white hover:text-cyan-400 focus:outline-none p-2"
+                className="text-slate-800 dark:text-white hover:text-cyan-600 dark:hover:text-cyan-400 focus:outline-none p-2"
                 aria-label="Toggle mobile menu"
               >
                 {isMobileMenuOpen ? (
@@ -160,13 +160,13 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onNavigate, user, onLogout 
 
       {/* Mobile Dropdown Panel */}
       {isLoggedIn && isMobileMenuOpen && (
-        <div className="md:hidden glass border-t border-white/5 py-4 px-6 animate-fade-in-down">
+        <div className="md:hidden glass border-t border-slate-200 dark:border-white/5 py-4 px-6 animate-fade-in-down">
           <div className="flex flex-col space-y-3">
             {NAV_LINKS.map((link) => (
               <button
                 key={link.name}
                 onClick={() => { onNavigate(link.page); setIsMobileMenuOpen(false); }}
-                className="w-full text-left text-white/80 hover:text-cyan-400 py-2.5 text-base font-semibold border-b border-white/5 transition-all"
+                className="w-full text-left text-slate-700 dark:text-white/80 hover:text-cyan-600 dark:hover:text-cyan-400 py-2.5 text-base font-semibold border-b border-slate-100 dark:border-white/5 transition-all"
               >
                 {link.name}
               </button>
@@ -175,13 +175,13 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onNavigate, user, onLogout 
               <>
                 <button
                   onClick={() => { onNavigate('profile'); setIsMobileMenuOpen(false); }}
-                  className="w-full text-left text-white/80 hover:text-cyan-400 py-2.5 text-base font-semibold border-b border-white/5 transition-all flex items-center space-x-2"
+                  className="w-full text-left text-slate-700 dark:text-white/80 hover:text-cyan-600 dark:hover:text-cyan-400 py-2.5 text-base font-semibold border-b border-slate-100 dark:border-white/5 transition-all flex items-center space-x-2"
                 >
                   <span>My Security Profile</span>
                 </button>
                 <button
                   onClick={() => { onLogout(); setIsMobileMenuOpen(false); }}
-                  className="w-full text-left text-red-400 hover:text-red-300 py-2.5 text-base font-semibold transition-all flex items-center space-x-2"
+                  className="w-full text-left text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 py-2.5 text-base font-semibold transition-all flex items-center space-x-2"
                 >
                   <span>Terminate Session</span>
                 </button>

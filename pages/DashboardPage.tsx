@@ -136,8 +136,8 @@ const DashboardPage: React.FC = () => {
             const result = await analyzeImageForAI(base64Image, imageFile.type);
             setImageResult(result);
             updateHistory('image', imageFile.name, result.classification);
-        } catch (err) {
-            showToast('Analysis failed', 'error');
+        } catch (err: any) {
+            showToast(err?.message || 'Analysis failed', 'error');
         } finally {
             handleLoading('image', false);
         }
@@ -159,8 +159,8 @@ const DashboardPage: React.FC = () => {
             const result = await analyzeArticleContent(content);
             setArticleResult(result);
             updateHistory('article', trimmedInput.substring(0, 40) + '...', `Risk: ${result.riskLevel}`);
-        } catch (err) {
-            showToast('Check failed', 'error');
+        } catch (err: any) {
+            showToast(err?.message || 'Check failed', 'error');
         } finally {
             handleLoading('article', false);
         }
@@ -172,8 +172,8 @@ const DashboardPage: React.FC = () => {
         try {
             const result = await generateAwarenessTemplateText(templatePrompt);
             setTemplateContent(result);
-        } catch (err) {
-            showToast('Generation failed', 'error');
+        } catch (err: any) {
+            showToast(err?.message || 'Generation failed', 'error');
         } finally {
             handleLoading('template', false);
         }
@@ -210,8 +210,8 @@ const DashboardPage: React.FC = () => {
                         setArticleResult(checkResult);
                         updateHistory('article', queryText.substring(0, 40) + '...', `Risk: ${checkResult.riskLevel}`);
                         addAssistantMessage('bot', `Factual analysis complete. Factual alignment is ${checkResult.credibilityScore}% with a ${checkResult.riskLevel} credibility threat indicator.`, true);
-                    } catch (e) {
-                        showToast('Check failed', 'error');
+                    } catch (e: any) {
+                        showToast(e?.message || 'Check failed', 'error');
                     } finally {
                         handleLoading('article', false);
                     }
@@ -231,8 +231,8 @@ const DashboardPage: React.FC = () => {
                         const kitResult = await generateAwarenessTemplateText(topicText);
                         setTemplateContent(kitResult);
                         addAssistantMessage('bot', `I've prepared a safety kit for "${topicText}". Click "View Generated Kit" to review.`, true);
-                    } catch (e) {
-                        showToast('Generation failed', 'error');
+                    } catch (e: any) {
+                        showToast(e?.message || 'Generation failed', 'error');
                     } finally {
                         handleLoading('template', false);
                     }
@@ -240,8 +240,8 @@ const DashboardPage: React.FC = () => {
                     addAssistantMessage('bot', 'Please specify a target narrative to build a safety kit for.', true);
                 }
             }
-        } catch (err) {
-            showToast("Command failed", 'error');
+        } catch (err: any) {
+            showToast(err?.message || "Command failed", 'error');
         } finally {
             handleLoading('voice', false);
         }

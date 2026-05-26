@@ -62,7 +62,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateProfile, onLogo
       {/* Background glow overlay */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full radial-glow-cyan pointer-events-none opacity-40"></div>
 
-      <div className="glass rounded-3xl shadow-2xl p-8 border border-white/5 relative z-10 space-y-8">
+      <div className="glass rounded-3xl shadow-2xl p-8 border border-slate-200 dark:border-white/5 relative z-10 space-y-8">
         
         <div className="flex flex-col items-center sm:flex-row sm:items-start space-y-6 sm:space-y-0 sm:space-x-8">
             
@@ -79,7 +79,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateProfile, onLogo
                     <>
                         <button 
                             onClick={() => fileInputRef.current?.click()}
-                            className="absolute bottom-0 right-0 bg-cyber-black/90 p-2.5 rounded-xl shadow-md border border-white/10 hover:border-cyan-400/50 hover:text-cyan-400 text-white transition-all"
+                            className="absolute bottom-0 right-0 bg-white dark:bg-cyber-black/90 p-2.5 rounded-xl shadow-md border border-slate-200 dark:border-white/10 hover:border-cyan-500/50 hover:text-cyan-500 dark:hover:text-cyan-400 text-slate-800 dark:text-white transition-all"
                             aria-label="Upload custom avatar image"
                         >
                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
@@ -103,20 +103,20 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateProfile, onLogo
                             type="text"
                             value={name}
                             onChange={handleNameChange}
-                            className="w-full text-2xl font-black bg-white/5 px-4 py-2 rounded-xl border border-white/10 text-white focus:ring-1 focus:ring-cyan-400 focus:outline-none font-sans"
+                            className="w-full text-2xl font-black bg-slate-100/50 dark:bg-white/5 px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white focus:ring-1 focus:ring-cyan-400 focus:outline-none font-sans"
                         />
                         {nameError && <p className="text-red-400 text-xs font-mono">{nameError}</p>}
                     </div>
                 ) : (
-                    <h2 className="text-3xl font-black font-heading tracking-tight text-white">{user.name}</h2>
+                    <h2 className="text-3xl font-black font-heading tracking-tight text-slate-800 dark:text-white">{user.name}</h2>
                 )}
-                <p className="text-xs uppercase tracking-widest font-mono text-white/40">Credential Signature</p>
-                <p className="text-sm font-mono text-white/70">{user.email}</p>
+                <p className="text-xs uppercase tracking-widest font-mono text-slate-400 dark:text-white/40">Credential Signature</p>
+                <p className="text-sm font-mono text-slate-600 dark:text-white/70">{user.email}</p>
             </div>
         </div>
 
         {/* Action Controls */}
-        <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="pt-6 border-t border-slate-100 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
              {isEditing ? (
                 <div className="flex space-x-4 w-full sm:w-auto">
                     <button 
@@ -127,7 +127,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateProfile, onLogo
                     </button>
                     <button 
                       onClick={handleCancel} 
-                      className="w-full sm:w-auto bg-white/5 border border-white/10 hover:bg-white/10 text-white font-extrabold text-xs uppercase tracking-widest py-3 px-6 rounded-xl transition-all"
+                      className="w-full sm:w-auto bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-white font-extrabold text-xs uppercase tracking-widest py-3 px-6 rounded-xl transition-all"
                     >
                         Discard
                     </button>

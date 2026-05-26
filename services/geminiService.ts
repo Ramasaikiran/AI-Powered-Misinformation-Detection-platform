@@ -13,7 +13,14 @@ const apiCall = async (action: string, payload: any = {}) => {
     });
     
     if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`);
+        let errorMsg = `API error: ${response.statusText}`;
+        try {
+            const errJson = await response.json();
+            if (errJson.error) {
+                errorMsg = errJson.error + (errJson.details ? ` - ${errJson.details}` : '');
+            }
+        } catch (_) {}
+        throw new Error(errorMsg);
     }
     return response.json();
 };

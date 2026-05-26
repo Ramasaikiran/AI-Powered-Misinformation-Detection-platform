@@ -3,20 +3,20 @@ import React from 'react';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="w-full border-t border-white/5 bg-cyber-black/80 backdrop-blur-md py-12 mt-auto">
+    <footer className="w-full border-t border-slate-200 dark:border-white/5 bg-slate-50/85 dark:bg-cyber-black/80 backdrop-blur-md py-12 mt-auto">
       <div className="container mx-auto px-6 sm:px-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           
           {/* Left: Brand Signature */}
           <div className="flex items-center space-x-2">
-            <span className="text-lg font-black font-heading tracking-wider text-white">
-              Code <span className="text-cyan-400 font-light">Hustlers</span>
+            <span className="text-lg font-black font-heading tracking-wider text-slate-800 dark:text-white">
+              Code <span className="text-cyan-500 dark:text-cyan-400 font-light">Hustlers</span>
             </span>
-            <span className="text-xs text-white/30">| Enterprise Credibility Engine</span>
+            <span className="text-xs text-slate-400 dark:text-white/30">| Enterprise Credibility Engine</span>
           </div>
 
           {/* Center: Copyright */}
-          <div className="text-center text-sm text-white/40">
+          <div className="text-center text-sm text-slate-500 dark:text-white/40">
             <p>© {new Date().getFullYear()} Code Hustlers. Securely processed via advanced NLP.</p>
           </div>
 
@@ -26,7 +26,7 @@ const Footer: React.FC = () => {
               href="https://github.com" 
               target="_blank" 
               rel="noreferrer" 
-              className="w-9 h-9 rounded-xl glass flex items-center justify-center text-white/60 hover:text-cyan-400 hover:border-cyan-400/30 hover:-translate-y-0.5 transition-all duration-300"
+              className="w-9 h-9 rounded-xl glass flex items-center justify-center text-slate-500 dark:text-white/60 hover:text-cyan-600 dark:hover:text-cyan-400 hover:border-cyan-400/30 hover:-translate-y-0.5 transition-all duration-300"
               aria-label="GitHub Security Repository"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -37,7 +37,7 @@ const Footer: React.FC = () => {
               href="https://twitter.com" 
               target="_blank" 
               rel="noreferrer" 
-              className="w-9 h-9 rounded-xl glass flex items-center justify-center text-white/60 hover:text-cyan-400 hover:border-cyan-400/30 hover:-translate-y-0.5 transition-all duration-300"
+              className="w-9 h-9 rounded-xl glass flex items-center justify-center text-slate-500 dark:text-white/60 hover:text-cyan-600 dark:hover:text-cyan-400 hover:border-cyan-400/30 hover:-translate-y-0.5 transition-all duration-300"
               aria-label="Twitter Security Feed"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
